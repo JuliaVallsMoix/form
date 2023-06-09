@@ -10,6 +10,14 @@ import { Icon } from "@iconify/react";
 
 export const SignUp = ({ handleData }) => {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const DniNiePattern = /([0-9]{8}[A-Z])|([X-Z][1-9]{7}[A-Z])/;
+
+  function getInvalidDniNieError(dniNie) {
+    if (!DniNiePattern.test(dniNie)) {
+      return "Your DNI or NIE is incorrect."
+    }
+  }
+
   function getInvalidPasswordError(password) {
     if (!/(?=.*[a-z])/.test(password)) {
       return "Password should contain at least one lowercase letter.";
@@ -57,13 +65,35 @@ export const SignUp = ({ handleData }) => {
         className="flex flex-col md:w-[50vw] w-full border border-secondary p-6 gap-4 rounded"
         onSubmit={handleSubmit(onSubmit)}
       >
+
+        {/* Dni------------------- */}
+        <div className="flex flex-col gap-2" >
+          <label className="label-text">DNI or NIE</label>
+          <div className="flex flex-col relative">
+            <input type="text"
+              className={`input input-md input-bordered w-full  ${errors.dniNie ? "input-error" : ""
+                }`}
+              placeholder="45624586D or X1234567B"
+              {...register("dniNie", {
+                //This is the validation
+                required: true,
+                validate: getInvalidDniNieError
+              })} />
+            {errors.dniNie?.type == "validate" && (
+              <span className="text-error"> {errors.dniNie.message}</span>
+            )}
+            {errors.dniNie?.type == "required" && (
+              <span className="text-error"> Necesitas escribir un DNI válido</span>
+            )}
+          </div>
+        </div>
+
         {/* Email---------------- */}
         <div className="flex flex-col gap-2">
           <label className="label-text">Email</label>
           <input
-            className={`input input-md input-bordered  ${
-              errors.email ? "input-error" : ""
-            }`}
+            className={`input input-md input-bordered  ${errors.email ? "input-error" : ""
+              }`}
             placeholder="Email"
             {...register("email", {
               //This is the validation
@@ -82,9 +112,8 @@ export const SignUp = ({ handleData }) => {
           <div className="flex flex-col relative">
             <input
               type={showPassword ? "text" : "password"}
-              className={`input input-md input-bordered w-full  ${
-                errors.password ? "input-error" : ""
-              }`}
+              className={`input input-md input-bordered w-full  ${errors.password ? "input-error" : ""
+                }`}
               placeholder="password"
               {...register("password", {
                 //This is the validation
